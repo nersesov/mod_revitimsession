@@ -1,0 +1,100 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_revitimsession/create_practice_step3
+
+    Template for the create practice exam step 3 page.
+
+    Classes required for JS:
+    * none
+
+    Data attributes required for JS:
+    * none
+
+    Context variables required for this template:
+    * id - The course module ID
+    * question_count - The number of questions selected
+    * sum_item_count - The total number of questions available
+    * totalquestions - The total questions for display
+    * practice_session_size_desc - Description for session size
+    * practice_gleim_recommendation - Gleim recommendation text
+    * practice_number_of_questions - Label for number of questions input
+    * practice_maximum_info - Maximum info text with placeholders
+    * previous_url - URL for previous button
+    * previous_text - Text for previous button
+    * cancel_url - URL for cancel button
+    * cancel_text - Text for cancel button
+    * next_text - Text for next button
+}}
+
+<div style="text-align: center; margin-bottom: 30px;">
+    {{#type}}
+        {{#study}}
+            <h1>Create Study Session</h1>
+        {{/study}}
+        {{^study}}
+            <h1>Create Practice Exam</h1>
+        {{/study}}
+    {{/type}}
+    {{^type}}
+        <h1>Create Practice Exam</h1>
+    {{/type}}
+</div>
+
+<div style="text-align: left; margin-bottom: 20px;">
+    <h3>Session Size</h3>
+</div>
+
+<form method="post" action="">
+    <input type="hidden" name="id" value="{{id}}">
+    {{#type}}
+        <input type="hidden" name="type" value="{{type}}">
+    {{/type}}
+    
+    <div class="practice-exam-container">
+        <div class="session-size-container">
+            <!-- Session size description -->
+            <div class="size-description">
+                <p>{{practice_session_size_desc}}</p>
+                <p class="recommendation">{{practice_gleim_recommendation}}</p>
+            </div>
+            
+            <!-- Number of questions input section -->
+            <div class="question-input-section">
+                <div class="input-with-max">
+                    <label for="question_count" class="input-label">{{practice_number_of_questions}}</label>
+                    <input type="number" id="question_count" name="question_count" value="{{question_count}}" min="1" max="{{sum_item_count}}" class="form-control question-input">
+                    <span class="max-text">{{practice_maximum_info}}</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Navigation buttons -->
+        <div class="navigation-buttons mt-4">
+            <div class="d-flex justify-content-start gap-2">
+                <a href="{{previous_url}}" class="btn btn-previous-custom">{{previous_text}}</a>
+                <a href="{{cancel_url}}" class="btn btn-cancel-custom">{{cancel_text}}</a>
+                {{#is_study_session}}
+                    <button type="submit" name="submit" value="1" class="btn btn-primary">{{finish_text}}</button>
+                {{/is_study_session}}
+                {{^is_study_session}}
+                    <button type="submit" name="submit" value="1" class="btn btn-primary">{{next_text}}</button>
+                {{/is_study_session}}
+            </div>
+        </div>
+    </div>
+</form>

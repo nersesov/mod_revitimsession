@@ -1,0 +1,245 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_revitimsession/perform_exam
+
+    Template for the perform exam page.
+
+    Classes required for JS:
+    * none
+
+    Data attributes required for JS:
+    * none
+
+    Context variables required for this template:
+    * coursename - The course name
+    * username - The user's full name
+    * totaltimeminutes - Total time in minutes
+    * totalquestions - Total number of questions
+    * questions - Array of questions with their data
+    * examid - The exam ID
+    * id - The course module ID
+}}
+
+<!-- Load CSS -->
+<link rel="stylesheet" href="styles.css">
+
+<div class="exam-container" 
+     data-total-questions="{{totalquestions}}" 
+     data-time-remaining="{{timeremaining}}" 
+     data-exam-id="{{examid}}">
+            <div class="exam-header">
+        <div>
+            <h2>{{coursename}} - {{username}}</h2>
+        </div>
+        <div class="header-controls">
+            <form method="POST" action="perform_exam.php" class="practice-exam-form-inline">
+                <input type="hidden" name="action" value="save_and_logout">
+                <input type="hidden" name="id" value="{{id}}">
+                <input type="hidden" name="examid" value="{{examid}}">
+                <input type="hidden" name="timeremaining" id="timeremaining-input" value="0">
+                <input type="hidden" name="answers" id="answers-input" value="{}">
+                <input type="hidden" name="status" id="status-input" value="{}">
+                <input type="hidden" name="markedforreview" id="markedforreview-input" value="{}">
+                <input type="hidden" name="correct" id="correct-input" value="{}">
+                <input type="hidden" name="studyunit" id="studyunit-input" value="{{subunit_string}}">
+                <button type="submit" class="nav-button save-logout-btn" id="save-logout-btn">{{save_logout}}</button>
+            </form>
+            <div class="timer" id="timer">{{time_remaining}} <span id="time-display">{{totaltimeminutes}}:00</span></div>
+        </div>
+    </div>
+    <div class="question-counter" id="question-counter">1/{{totalquestions}}</div>
+
+    <!-- Instructions button and review section -->
+    <div class="top-controls">
+        {{#review}}
+        <button class="calculator-btn" data-action="open-instructions" aria-label="{{instructions}}" title="{{instructions}}">{{instructions}}</button>
+        {{/review}}
+        {{^review}}
+        <button type="button" id="calculator" class="calculator-button" name="ciaCalculator" aria-label="{{calculator}}" title="{{calculator}}">
+            <i class="fas fa-calculator" aria-hidden="true"></i>
+        </button>
+        {{/review}}
+
+        <!-- Review flag section -->
+        <div class="review-section">
+            <button type="button" class="review-flag unmarked" id="review-flag" data-action="toggle-review-flag" aria-label="{{marked_for_review_text}}" title="{{marked_for_review_text}}" role="button">🏳️</button>
+            <button type="button" class="review-text" id="review-text" data-action="toggle-review-flag" aria-label="{{marked_for_review_text}}" title="{{marked_for_review_text}}">{{marked_for_review_text}}</button>
+        </div>
+    </div>
+
+    <!-- Question numbers navigation -->
+    <div class="question-numbers" id="question-numbers" role="navigation" aria-label="Question navigation">
+        {{#questions}}
+            <button type="button" class="question-number{{#first}} active{{/first}}" data-question="{{questionorder}}" data-action="go-to-question" aria-label="{{question_number}} {{questionorder}}" title="{{question_number}} {{questionorder}}" role="button">{{questionorder}}</button>
+        {{/questions}}
+    </div>
+
+    <!-- Questions -->
+    <div id="questions-container">
+        {{#questions}}
+            <div class="question{{#first}} active{{/first}}" id="question-{{questionorder}}" role="main" aria-labelledby="question-title-{{questionorder}}">
+                <h3 id="question-title-{{questionorder}}">{{question}} {{questionorder}}{{#questionname}} - {{questionname}}{{/questionname}}</h3>
+                <div class="question-text" role="group" aria-labelledby="question-title-{{questionorder}}">{{{questiontext}}}</div>
+                
+                <div class="answer-options" role="radiogroup" aria-labelledby="question-title-{{questionorder}}">
+                    {{#answers}}
+                        <div class="answer-option">
+                            <input type="radio" name="answer-{{questionorder}}" value="{{id}}" id="answer-{{questionorder}}-{{id}}" {{{checked}}} aria-describedby="answer-{{questionorder}}-{{id}}-label">
+                            <label for="answer-{{questionorder}}-{{id}}" id="answer-{{questionorder}}-{{id}}-label">{{{answer}}}</label>
+                        </div>
+                    {{/answers}}
+                </div>
+            </div>
+        {{/questions}}
+    </div>
+
+    <!-- Section Review (shown only on last question) -->
+    <div class="section-review practice-exam-section-review" id="section-review">
+        <h3>{{section_review}}</h3>
+        <button type="button" class="practice-exam-header" data-action="toggle-practice-exam" aria-label="{{practice_exam}}" title="{{practice_exam}}" role="button">
+            <span class="toggle-icon" id="toggle-icon" aria-hidden="true">+</span>
+            <span class="practice-exam-title">{{practice_exam}}</span>
+            <span class="practice-exam-stats" id="practice-exam-stats" aria-hidden="true"></span>
+        </button>
+        <div class="question-list practice-exam-question-list" id="question-list">
+            {{#questions}}
+                <div class="question-link-item">
+                    <span class="question-flag" id="flag-{{questionorder}}" aria-hidden="true">🏳️</span>
+                    <button type="button" class="question-link" data-action="go-to-question" data-question="{{questionorder}}" aria-label="{{question}} {{questionorder}}" title="{{question}} {{questionorder}}" role="button">{{question}} {{questionorder}}</button>
+                </div>
+            {{/questions}}
+        </div>
+    </div>
+
+    <!-- Navigation buttons -->
+    <div class="navigation" id="question-navigation">
+        <div class="navigation-left">
+            <!-- Empty left section for normal navigation -->
+        </div>
+        <div class="navigation-right">
+            <button class="nav-button" id="prev-btn" disabled aria-label="{{previous}}" title="{{previous}}">{{previous}}</button>
+            <button class="nav-button" data-action="open-navigator" aria-label="{{navigator}}" title="{{navigator}}">{{navigator}}</button>
+            <button class="nav-button" id="next-btn" aria-label="{{next}}" title="{{next}}">{{next}}</button>
+        </div>
+    </div>
+    
+    <!-- Review buttons (hidden by default) -->
+    <div class="navigation practice-exam-review-navigation" id="review-navigation" role="navigation" aria-label="Review navigation">
+        <button class="nav-button" data-action="end-review" aria-label="{{end_review}}" title="{{end_review}}">{{end_review}}</button>
+        <button class="nav-button" data-action="review-all" aria-label="{{review_all}}" title="{{review_all}}">{{review_all}}</button>
+        <button class="nav-button" data-action="review-incomplete" aria-label="{{review_incomplete}}" title="{{review_incomplete}}">{{review_incomplete}}</button>
+        <button class="nav-button" data-action="review-marked" aria-label="{{review_marked}}" title="{{review_marked}}">{{review_marked}}</button>
+    </div>
+    
+    <!-- Review navigation buttons (hidden by default) -->
+    <div class="navigation practice-exam-review-question-navigation" id="review-question-navigation" role="navigation" aria-label="Review question navigation">
+        <div class="navigation-left">
+            <button class="nav-button" data-action="go-to-review-screen" aria-label="{{review_screen}}" title="{{review_screen}}">{{review_screen}}</button>
+        </div>
+        <div class="navigation-right">
+            <button class="nav-button" id="review-prev-btn" disabled aria-label="{{previous}}" title="{{previous}}">{{previous}}</button>
+            <button class="nav-button" data-action="end-review" aria-label="{{end_review}}" title="{{end_review}}">{{end_review}}</button>
+            <button class="nav-button" data-action="review-all" aria-label="{{review_all}}" title="{{review_all}}">{{review_all}}</button>
+            <button class="nav-button" data-action="review-incomplete" aria-label="{{review_incomplete}}" title="{{review_incomplete}}">{{review_incomplete}}</button>
+            <button class="nav-button" data-action="review-marked" aria-label="{{review_marked}}" title="{{review_marked}}">{{review_marked}}</button>
+            <button class="nav-button" id="review-next-btn" aria-label="{{next}}" title="{{next}}">{{next}}</button>
+        </div>
+    </div>
+</div>
+
+<!-- Instructions Modal -->
+<div id="instructions-modal" class="calculator-modal" role="dialog" aria-labelledby="instructions-title" aria-modal="true">
+    <div class="calculator-content practice-exam-modal-content practice-exam-modal-content-wide">
+        <div class="calculator-header">
+            <h3 id="instructions-title">{{review_instructions}}</h3>
+            <button type="button" class="practice-exam-close-btn" data-action="close-instructions" aria-label="Close instructions" title="Close instructions">&times;</button>
+        </div>
+        <div class="practice-exam-instructions-content">
+            <p>{{instructions_summary}}</p>
+            <p>{{instructions_buttons}}</p>
+            <ul class="practice-exam-instructions-list">
+                <li>{{instructions_review_all}}</li>
+                <li>{{instructions_review_incomplete}}</li>
+                <li>{{instructions_review_marked}}</li>
+            </ul>
+            <p>{{instructions_click_question}}</p>
+        </div>
+    </div>
+</div>
+
+<!-- Calculator Modal - Created dynamically by calculator.js -->
+
+<!-- Navigator Modal -->
+<div id="navigator-modal" class="navigator-modal practice-exam-modal-hide" role="dialog" aria-labelledby="navigator-title" aria-modal="true">
+    <div class="navigator-content">
+        <div class="navigator-header">
+            <h3 id="navigator-title">{{navigator_title}}</h3>
+            <button type="button" class="practice-exam-close-btn" data-action="close-navigator" aria-label="Close navigator" title="Close navigator">&times;</button>
+        </div>
+        <table class="navigator-table" role="table" aria-label="Question navigation table">
+            <thead>
+                <tr role="row">
+                    <th role="columnheader">{{question_number}}</th>
+                    <th role="columnheader">{{status}}</th>
+                    <th role="columnheader">{{marked_for_review}}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#questions}}
+                    <tr role="row">
+                        <td role="cell"><button type="button" class="navigator-question" data-action="go-to-question" data-question="{{questionorder}}" aria-label="{{question}} {{questionorder}}" title="{{question}} {{questionorder}}">{{question}} {{questionorder}}</button></td>
+                        <td id="status-{{questionorder}}" role="cell">{{#first}}{{current}}{{/first}}{{^first}}{{unseen}}{{/first}}</td>
+                        <td role="cell"><input type="checkbox" id="marked-{{questionorder}}" data-action="toggle-marked" data-question="{{questionorder}}" aria-label="Mark question {{questionorder}} for review" title="Mark question {{questionorder}} for review"></td>
+                    </tr>
+                {{/questions}}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Grade Confirmation Modal -->
+<div id="grade-confirmation-modal" class="calculator-modal" role="dialog" aria-labelledby="grade-modal-title" aria-modal="true"
+     data-graded-successfully="{{exam_graded_successfully}}"
+     data-grading-error="{{exam_grading_error}}">
+    <div class="calculator-content practice-exam-modal-content practice-exam-modal-content-narrow">
+        <div class="calculator-header">
+            <h3 id="grade-modal-title">{{grade_session_title}}</h3>
+            <button type="button" class="practice-exam-close-btn" data-action="close-grade-confirmation" aria-label="Close grade confirmation" title="Close grade confirmation">&times;</button>
+        </div>
+        <div class="practice-exam-grade-content">
+            <p id="grade-modal-message">{{grade_confirm_message}}</p>
+        </div>
+        <div class="practice-exam-grade-buttons">
+            <button type="button" class="nav-button practice-exam-grade-btn" data-action="close-grade-confirmation" aria-label="{{go_back_text}}" title="{{go_back_text}}">{{go_back_text}}</button>
+            <button type="button" class="nav-button practice-exam-grade-btn practice-exam-grade-btn-confirm" data-action="confirm-grade" aria-label="{{grade_text}}" title="{{grade_text}}">{{grade_text}}</button>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden data for JavaScript -->
+<div id="marked-data" data-marked='{{marked_data_json}}' class="hidden-data"></div>
+<div id="status-data" data-status='{{status_data_json}}' class="hidden-data"></div>
+<div id="correct-data" data-correct='{{correct_data_json}}' class="hidden-data"></div>
+<div id="question-data" data-questions='{{questions_json}}' class="hidden-data"></div>
+<div id="lang-strings" data-lang='{{lang_strings}}' class="hidden-data"></div>
+<input type="hidden" id="studyunit-input" value="{{subunit_string}}">
+
+<!-- Load JavaScript -->
+<script src="javascript/calculator.js?v=2025092447"></script>
+<script src="javascript/perform_exam.js?v=2025092447"></script>
+

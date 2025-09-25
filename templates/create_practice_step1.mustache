@@ -1,0 +1,152 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_revitimsession/create_practice_step1
+
+    Template for the create practice exam step 1 page.
+
+    Classes required for JS:
+    * none
+
+    Data attributes required for JS:
+    * none
+
+    Context variables required for this template:
+    * id - The course module ID
+    * session_approach - The selected session approach
+    * select_all - Whether select all is checked
+    * organized_categories - Array of organized categories
+    * has_categories - Boolean indicating if categories exist
+    * no_categories_message - Message when no categories available
+    * go_to_question_bank_url - URL to question bank
+    * go_to_question_bank_text - Text for question bank link
+    * cancel_url - URL for cancel button
+    * cancel_text - Text for cancel button
+    * next_text - Text for next button
+}}
+
+<div style="text-align: center; margin-bottom: 30px;">
+    {{#type}}
+        {{#study}}
+            <h1>Create Study Session</h1>
+        {{/study}}
+        {{^study}}
+            <h1>Create Practice Exam</h1>
+        {{/study}}
+    {{/type}}
+    {{^type}}
+        <h1>Create Practice Exam</h1>
+    {{/type}}
+</div>
+
+{{#has_categories}}
+<div class="question-bank-container">
+    <form method="post" action="">
+        <input type="hidden" name="id" value="{{id}}">
+        {{#type}}
+            <input type="hidden" name="type" value="{{type}}">
+        {{/type}}
+        
+        <!-- Approach selection section -->
+        <div class="approach-selection">
+            <h5>{{practice_create_session_using}}</h5>
+            <div class="radio-options">
+                <div class="radio-option">
+                    <input type="radio" id="gleim-approach" name="session_approach" value="gleim"{{#session_approach_gleim}} checked{{/session_approach_gleim}}>
+                    <label for="gleim-approach">{{practice_gleim_suggested_approach}}</label>
+                </div>
+                <div class="radio-option">
+                    <input type="radio" id="customized-approach" name="session_approach" value="customized"{{#session_approach_customized}} checked{{/session_approach_customized}}>
+                    <label for="customized-approach">{{practice_customized_exam_options}}</label>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Selection header with category tree inside -->
+        <div class="selection-header">
+            <h5>{{practice_select_study_units}}</h5>
+            <p>{{practice_select_study_units_desc}}</p>
+            <div class="select-all-container">
+                <input type="checkbox" id="select-all" name="select_all" class="select-all-checkbox"{{#select_all}} checked{{/select_all}}>
+                <label for="select-all">{{practice_select_all_study_units}}</label>
+            </div>
+            
+            <div class="category-tree">
+                {{#organized_categories}}
+                    {{#is_root}}
+                        <!-- Top-level categories -->
+                        {{#categories}}
+                            <div class="category-item">
+                                <div class="category-header">
+                                    <input type="checkbox" class="category-checkbox" name="selected_categories[]" id="cat-{{questioncategoryid}}" value="{{questioncategoryid}}"{{#is_checked}} checked{{/is_checked}}>
+                                    <span class="category-name"><strong>{{categoryname}}</strong></span>
+                                    <span class="category-count"><span class="badge badge-info">{{item_count}}</span></span>
+                                </div>
+                            </div>
+                        {{/categories}}
+                    {{/is_root}}
+                    {{^is_root}}
+                        <!-- Parent category with subcategories -->
+                        <div class="parent-category">
+                            <div class="parent-header">
+                                <input type="checkbox" class="parent-checkbox" id="parent-{{parent_id}}" data-parent="{{parent_id}}"{{#parent_checked}} checked{{/parent_checked}}>
+                                <span class="expand-icon" id="icon-{{parent_id}}" onclick="toggleSubcategories('{{parent_id}}')">+</span>
+                                <span class="parent-name"><strong>{{parentname}}</strong></span>
+                                <span class="parent-count"><span class="badge badge-primary">{{parent_total}}</span></span>
+                            </div>
+                            <div class="subcategories" id="sub-{{parent_id}}" style="display: none;">
+                                {{#categories}}
+                                    <div class="subcategory-item">
+                                        <div class="subcategory-header">
+                                            <input type="checkbox" class="subcategory-checkbox" name="selected_categories[]" id="subcat-{{questioncategoryid}}" value="{{questioncategoryid}}" data-parent="{{parent_id}}"{{#is_checked}} checked{{/is_checked}}>
+                                            <span class="subcategory-name">{{categoryname}}</span>
+                                            <span class="subcategory-count"><span class="badge badge-info">{{item_count}}</span></span>
+                                        </div>
+                                    </div>
+                                {{/categories}}
+                            </div>
+                        </div>
+                    {{/is_root}}
+                {{/organized_categories}}
+            </div>
+        </div>
+        
+        <!-- Navigation buttons -->
+        <div class="navigation-buttons mt-4">
+            <div class="d-flex justify-content-start gap-2">
+                <a href="{{cancel_url}}" class="btn btn-cancel-custom">{{cancel_text}}</a>
+                <button type="submit" name="submit" value="1" class="btn btn-primary">{{next_text}}</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- JavaScript for expand/collapse and checkbox functionality -->
+<script src="javascript/create_practice_step1.js"></script>
+{{/has_categories}}
+
+{{^has_categories}}
+<div class="alert alert-info">
+    {{no_categories_message}}
+</div>
+
+{{#has_question_permission}}
+<div class="mt-3">
+    <a href="{{go_to_question_bank_url}}" class="btn btn-info">{{go_to_question_bank_text}}</a>
+</div>
+{{/has_question_permission}}
+{{/has_categories}}

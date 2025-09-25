@@ -1,0 +1,17 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="12" cy="12" r="11" fill="#4CAF50" stroke="#2E7D32" stroke-width="1"/>
+  
+  <!-- Document/Test icon -->
+  <rect x="6" y="4" width="12" height="16" rx="1" fill="white" opacity="0.9"/>
+  
+  <!-- Lines representing text/questions -->
+  <rect x="8" y="7" width="8" height="1" fill="#4CAF50" rx="0.5"/>
+  <rect x="8" y="9" width="6" height="1" fill="#4CAF50" rx="0.5"/>
+  <rect x="8" y="11" width="7" height="1" fill="#4CAF50" rx="0.5"/>
+  <rect x="8" y="13" width="5" height="1" fill="#4CAF50" rx="0.5"/>
+  <rect x="8" y="15" width="6" height="1" fill="#4CAF50" rx="0.5"/>
+  
+  <!-- Checkmark for completion -->
+  <path d="M9 18L11 20L15 16" stroke="#4CAF50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

@@ -1,0 +1,171 @@
+# Cursor AI Rules - Revit IM Session Plugin
+
+## Project Context
+This is a Moodle plugin called `mod_revitimsession` that provides practice exam and study session functionality with advanced filtering capabilities.
+
+## Current State (September 2025)
+- **Version**: 2025091949
+- **Status**: Fully functional with advanced filter system
+- **Main Features**: Practice exams, study sessions, filtering, statistics, timer management
+
+## Critical Architecture
+
+### Global JavaScript Arrays (CRITICAL - Don't Break These)
+```javascript
+// These arrays track real-time state and MUST be maintained
+let status = {};           // 0=unseen, 1=incomplete, 2=answered
+let correct = {};          // 0=incorrect, 1=correct, 2=first-time correct  
+let markedforreview = {};  // 0=not marked, 1=marked
+
+// These arrays are initialized from database and updated in real-time
+// NEVER create local versions of these arrays
+// ALWAYS use the global versions for consistency
+```
+
+### Filter System Logic (CRITICAL)
+```javascript
+// Filter conditions that MUST be maintained:
+// Unanswered Questions: status === 0
+// Marked Questions: markedforreview === 1  
+// Incorrect Questions: correct === 0 AND status === 2
+
+// The filter system uses radio buttons with automatic application
+// Navigation respects filtered questions only
+```
+
+### Database Schema
+- **Tables**: `revitimsession_practice_exams`, `revitimsession_practice_exam_questions`
+- **Study Sessions**: Use `studysession=1` flag (0=practice, 1=study)
+- **Status Values**: 0=unseen, 1=incomplete, 2=answered
+- **Correct Values**: 0=incorrect, 1=correct, 2=first-time correct
+
+## Key Files and Their Purposes
+
+### Core Files (DO NOT MODIFY WITHOUT UNDERSTANDING)
+- `javascript/perform_study.js` - Contains filter logic, global arrays, navigation
+- `templates/perform_study.mustache` - Contains filter menu HTML structure
+- `styles.css` - Contains filter menu styling
+- `perform_study.php` - Main study session interface
+
+### Recent Changes (2025091948-1949)
+- Fixed filter logic for unanswered questions (status === 0)
+- Fixed filter logic for incorrect questions (correct === 0 AND status === 2)
+- Fixed question marking for review functionality
+- Implemented dynamic arrays for real-time tracking
+- Removed section review, replaced with Test Bank navigation
+- Added utility functions for safe DOM manipulation
+
+## Development Rules
+
+### When Making Changes
+1. **NEVER** create local versions of `status`, `correct`, or `markedforreview` arrays
+2. **ALWAYS** use the global arrays for consistency
+3. **ALWAYS** increment version in `version.php` when changing strings or schema
+4. **ALWAYS** test filter functionality after any changes
+5. **ALWAYS** update CONTEXT.md with significant changes
+
+### Code Patterns to Follow
+```javascript
+// CORRECT: Use global arrays
+function someFunction() {
+    // Use global arrays directly
+    status[questionNum] = 2;
+    correct[questionNum] = 1;
+    markedforreview[questionNum] = 0;
+}
+
+// WRONG: Don't create local arrays
+function someFunction() {
+    const status = {}; // DON'T DO THIS
+    const correct = {}; // DON'T DO THIS
+}
+```
+
+### Filter System Patterns
+```javascript
+// CORRECT: Filter logic
+if (selectedFilter === 'incomplete' && currentStatus === 0) matchesFilter = true;
+if (selectedFilter === 'incorrect' && currentCorrect === 0 && currentStatus === 2) matchesFilter = true;
+
+// Navigation must respect filters
+const nextQ = getNextFilteredQuestion(currentQuestion);
+```
+
+## Common Issues and Solutions
+
+### If Filters Stop Working
+- Check that `applyFilter()` function exists and is called
+- Verify `filteredQuestions` array is being populated
+- Ensure navigation functions use filtered arrays
+
+### If Status Not Saving
+- Verify global arrays are being updated in real-time
+- Check that `prepareSaveAndGoHome()` uses global arrays
+- Ensure database fields are being set correctly
+
+### If Navigation Breaks
+- Check that `getNextFilteredQuestion()` and `getPreviousFilteredQuestion()` exist
+- Verify button state management is working
+- Ensure `currentQuestion` is being tracked correctly
+
+## Testing Requirements
+Before any commit, test:
+1. Create a study session
+2. Answer some questions, leave others unanswered
+3. Mark some questions for review
+4. Test all filter options
+5. Verify navigation works with filters
+6. Test saving (click Test Bank)
+7. Verify no JavaScript errors in console
+
+## File Structure Understanding
+```
+mod_revitimsession/
+├── .cursorrules              # This file - Cursor AI instructions
+├── CONTEXT.md                # Complete technical documentation
+├── MIGRATION_GUIDE.md        # Migration instructions
+├── javascript/perform_study.js    # Main JavaScript logic
+├── templates/perform_study.mustache # HTML template with filter menu
+├── styles.css               # All styling including filter menu
+├── perform_study.php        # Main PHP interface
+├── version.php              # Current version: 2025091949
+└── [other plugin files]
+```
+
+## Language and Communication
+- All code comments and documentation in English
+- All user-facing strings in `lang/en/revitimsession.php`
+- Version format: YYYYMMDDVV (e.g., 2025091949)
+
+## Debugging Approach
+1. Check browser console for JavaScript errors
+2. Verify global arrays are populated correctly
+3. Test filter logic step by step
+4. Check database for saved values
+5. Use browser developer tools to inspect DOM
+
+## Success Criteria
+A successful implementation should have:
+- Filter menu opens/closes correctly
+- All filter options work as expected
+- Navigation respects active filters
+- Questions can be marked for review
+- Status and correct tracking works
+- Data saves to database correctly
+- No JavaScript errors in console
+
+## Emergency Recovery
+If something breaks:
+1. Check CONTEXT.md for troubleshooting
+2. Verify global arrays are not being overwritten
+3. Test with a simple study session first
+4. Check that all required functions exist
+
+## Key Functions to Preserve
+- `initializeStatusData()` - Initializes global arrays
+- `applyFilter()` - Handles filter logic
+- `toggleReviewFlag()` - Updates markedforreview array
+- `showAnswerFeedback()` - Updates status and correct arrays
+- `getNextFilteredQuestion()` / `getPreviousFilteredQuestion()` - Filtered navigation
+
+Remember: This plugin has complex real-time state management. Always understand the global array system before making changes!

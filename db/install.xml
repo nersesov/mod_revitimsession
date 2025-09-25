@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="mod/revitimsession/db" VERSION="20250101" COMMENT="XMLDB file for Revit IM Session module"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="revitimsession" COMMENT="Each record is one Revit IM Session">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Course id"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Session name"/>
+        <FIELD NAME="intro" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Session description"/>
+        <FIELD NAME="introformat" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Format of intro field"/>
+        <FIELD NAME="starttime" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Session start time"/>
+        <FIELD NAME="endtime" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Session end time"/>
+        <FIELD NAME="allowguest" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Allow guest access"/>
+        <FIELD NAME="grade" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Maximum grade"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Time created"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Time modified"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="course" TYPE="foreign" FIELDS="course" REFTABLE="course" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="course" UNIQUE="false" FIELDS="course"/>
+        <INDEX NAME="starttime" UNIQUE="false" FIELDS="starttime"/>
+        <INDEX NAME="endtime" UNIQUE="false" FIELDS="endtime"/>
+      </INDEXES>
+    </TABLE>
+
+    <TABLE NAME="revitimsession_participants" COMMENT="Records of users participating in sessions">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="sessionid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Session id"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="User id"/>
+        <FIELD NAME="timejoined" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Time joined"/>
+        <FIELD NAME="timeleft" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Time left"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="sessionid" TYPE="foreign" FIELDS="sessionid" REFTABLE="revitimsession" REFFIELDS="id"/>
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="sessionid" UNIQUE="false" FIELDS="sessionid"/>
+        <INDEX NAME="userid" UNIQUE="false" FIELDS="userid"/>
+        <INDEX NAME="sessionuser" UNIQUE="true" FIELDS="sessionid, userid"/>
+      </INDEXES>
+    </TABLE>
+
+    <TABLE NAME="revitimsession_submissions" COMMENT="Records of work submitted by participants">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="sessionid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Session id"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="User id"/>
+        <FIELD NAME="content" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Submission content"/>
+        <FIELD NAME="contentformat" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Format of content field"/>
+        <FIELD NAME="attachment" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Attachment file path"/>
+        <FIELD NAME="comments" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Comments"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Time created"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Time modified"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="sessionid" TYPE="foreign" FIELDS="sessionid" REFTABLE="revitimsession" REFFIELDS="id"/>
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="sessionid" UNIQUE="false" FIELDS="sessionid"/>
+        <INDEX NAME="userid" UNIQUE="false" FIELDS="userid"/>
+        <INDEX NAME="sessionuser" UNIQUE="false" FIELDS="sessionid, userid"/>
+      </INDEXES>
+    </TABLE>
+
+    <TABLE NAME="revitimsession_grades" COMMENT="Grades for session submissions">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="sessionid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Session id"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="User id"/>
+                 <FIELD NAME="grade" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Grade"/>
+        <FIELD NAME="feedback" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Feedback"/>
+        <FIELD NAME="feedbackformat" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Format of feedback field"/>
+        <FIELD NAME="grader" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="User who graded"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Time created"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Time modified"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="sessionid" TYPE="foreign" FIELDS="sessionid" REFTABLE="revitimsession" REFFIELDS="id"/>
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+        <KEY NAME="grader" TYPE="foreign" FIELDS="grader" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="sessionid" UNIQUE="false" FIELDS="sessionid"/>
+        <INDEX NAME="userid" UNIQUE="false" FIELDS="userid"/>
+        <INDEX NAME="sessionuser" UNIQUE="true" FIELDS="sessionid, userid"/>
+      </INDEXES>
+    </TABLE>
+
+    <TABLE NAME="revitimsession_practice_exams" COMMENT="Practice exam records">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="User ID"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Course ID"/>
+        <FIELD NAME="status" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Exam status: 0=not finished, 1=finished"/>
+        <FIELD NAME="timeremaining" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Time remaining in seconds"/>
+        <FIELD NAME="totalquestions" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Total number of questions in this exam"/>
+        <FIELD NAME="randomanswers" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Randomize answers: 0=standard order, 1=random order"/>
+        <FIELD NAME="studysession" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Study session flag: 0=practice exam, 1=study session"/>
+        <FIELD NAME="studyunit" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Related study unit(s)"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Time created"/>
+        <FIELD NAME="timefinished" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Time when exam was finished"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+        <KEY NAME="courseid" TYPE="foreign" FIELDS="courseid" REFTABLE="course" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="userid" UNIQUE="false" FIELDS="userid"/>
+        <INDEX NAME="courseid" UNIQUE="false" FIELDS="courseid"/>
+        <INDEX NAME="status" UNIQUE="false" FIELDS="status"/>
+        <INDEX NAME="userstatus" UNIQUE="false" FIELDS="userid, status"/>
+        <INDEX NAME="coursestatus" UNIQUE="false" FIELDS="courseid, status"/>
+        <INDEX NAME="usercourse" UNIQUE="false" FIELDS="userid, courseid"/>
+        <INDEX NAME="timeremaining" UNIQUE="false" FIELDS="timeremaining"/>
+      </INDEXES>
+    </TABLE>
+
+    <TABLE NAME="revitimsession_practice_exam_questions" COMMENT="Questions for each practice exam">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="practiceexamid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Practice exam ID"/>
+        <FIELD NAME="questionid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Question ID"/>
+        <FIELD NAME="questionorder" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Order of question in exam"/>
+        <FIELD NAME="answer" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="User's selected answer ID"/>
+        <FIELD NAME="status" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Question status: 0=unseen, 1=incomplete, 2=complete"/>
+        <FIELD NAME="markedforreview" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Question marked for review: 0=no, 1=yes"/>
+        <FIELD NAME="correct" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="practiceexamid" TYPE="foreign" FIELDS="practiceexamid" REFTABLE="revitimsession_practice_exams" REFFIELDS="id"/>
+        <KEY NAME="questionid" TYPE="foreign" FIELDS="questionid" REFTABLE="question" REFFIELDS="id"/>
+        <KEY NAME="answer" TYPE="foreign" FIELDS="answer" REFTABLE="question_answers" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="practiceexamid" UNIQUE="false" FIELDS="practiceexamid"/>
+        <INDEX NAME="questionid" UNIQUE="false" FIELDS="questionid"/>
+        <INDEX NAME="practiceexamquestion" UNIQUE="true" FIELDS="practiceexamid, questionid"/>
+        <INDEX NAME="questionorder" UNIQUE="false" FIELDS="practiceexamid, questionorder"/>
+        <INDEX NAME="answer" UNIQUE="false" FIELDS="answer"/>
+        <INDEX NAME="status" UNIQUE="false" FIELDS="status"/>
+        <INDEX NAME="markedforreview" UNIQUE="false" FIELDS="markedforreview"/>
+      </INDEXES>
+    </TABLE>
+  </TABLES>
+</XMLDB>

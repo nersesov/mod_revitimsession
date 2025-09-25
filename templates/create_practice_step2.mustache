@@ -1,0 +1,115 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_revitimsession/create_practice_step2
+
+    Template for the create practice exam step 2 page.
+
+    Classes required for JS:
+    * none
+
+    Data attributes required for JS:
+    * none
+
+    Context variables required for this template:
+    * id - The course module ID
+    * question_order - The selected question order
+    * answer_order - The selected answer order
+    * question_order_standard - Boolean for standard question order
+    * question_order_random - Boolean for random question order
+    * answer_order_standard - Boolean for standard answer order
+    * answer_order_random - Boolean for random answer order
+    * practice_question_order_title - Title for question order section
+    * practice_question_order_desc - Description for question order section
+    * practice_answer_order_title - Title for answer order section
+    * practice_answer_order_desc - Description for answer order section
+    * practice_standard_order - Text for standard order option
+    * practice_random_order - Text for random order option
+    * previous_url - URL for previous button
+    * previous_text - Text for previous button
+    * cancel_url - URL for cancel button
+    * cancel_text - Text for cancel button
+    * next_text - Text for next button
+}}
+
+<div style="text-align: center; margin-bottom: 30px;">
+    {{#type}}
+        {{#study}}
+            <h1>Create Study Session</h1>
+        {{/study}}
+        {{^study}}
+            <h1>Create Practice Exam</h1>
+        {{/study}}
+    {{/type}}
+    {{^type}}
+        <h1>Create Practice Exam</h1>
+    {{/type}}
+</div>
+
+<form method="post" action="">
+    <input type="hidden" name="id" value="{{id}}">
+    {{#type}}
+        <input type="hidden" name="type" value="{{type}}">
+    {{/type}}
+    
+    <div class="practice-exam-container">
+        <div class="session-order-container">
+            <!-- Question order section -->
+            <div class="order-section">
+                <h4>{{practice_question_order_title}}</h4>
+                <p>{{practice_question_order_desc}}</p>
+                
+                <div class="radio-options">
+                    <div class="radio-option">
+                        <input type="radio" id="question-standard" name="question_order" value="standard"{{#question_order_standard}} checked{{/question_order_standard}}>
+                        <label for="question-standard">{{practice_standard_order}}</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="question-random" name="question_order" value="random"{{#question_order_random}} checked{{/question_order_random}}>
+                        <label for="question-random">{{practice_random_order}}</label>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Answer choice order section -->
+            <div class="order-section">
+                <h4>{{practice_answer_order_title}}</h4>
+                <p>{{practice_answer_order_desc}}</p>
+                
+                <div class="radio-options">
+                    <div class="radio-option">
+                        <input type="radio" id="answer-standard" name="answer_order" value="standard"{{#answer_order_standard}} checked{{/answer_order_standard}}>
+                        <label for="answer-standard">{{practice_standard_order}}</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="answer-random" name="answer_order" value="random"{{#answer_order_random}} checked{{/answer_order_random}}>
+                        <label for="answer-random">{{practice_random_order}}</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Navigation buttons -->
+        <div class="navigation-buttons mt-4">
+            <div class="d-flex justify-content-start gap-2">
+                <a href="{{previous_url}}" class="btn btn-previous-custom">{{previous_text}}</a>
+                <a href="{{cancel_url}}" class="btn btn-cancel-custom">{{cancel_text}}</a>
+                <button type="submit" name="submit" value="1" class="btn btn-primary">{{next_text}}</button>
+            </div>
+        </div>
+    </div>
+</form>

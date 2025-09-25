@@ -1,0 +1,351 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_revitimsession/perform_study
+
+    Template for the perform study session page.
+
+    Classes required for JS:
+    * none
+
+    Data attributes required for JS:
+    * none
+
+    Context variables required for this template:
+    * coursename - The course name
+    * username - The user's full name
+    * totaltimeminutes - Total time in minutes
+    * totalquestions - Total number of questions
+    * questions - Array of questions with their data
+    * examid - The study session ID
+    * id - The course module ID
+}}
+
+<!-- Load CSS -->
+<link rel="stylesheet" href="styles.css">
+
+<!-- Load JavaScript -->
+<script src="javascript/calculator.js?v=2025092447"></script>
+<script src="javascript/perform_study.js?v=2025092447"></script>
+
+<!-- Data for JavaScript initialization -->
+<div id="marked-data" data-marked='{{marked_data_json}}' class="hidden-data"></div>
+<div id="status-data" data-status='{{status_data_json}}' class="hidden-data"></div>
+<div id="question-data" data-questions='{{questions_json}}' class="hidden-data"></div>
+<div id="js-strings-data" data-strings='{{#js_strings}}{
+    "status_complete": "{{status_complete}}",
+    "status_incomplete": "{{status_incomplete}}",
+    "status_unseen": "{{status_unseen}}",
+    "feedback_correct": "{{feedback_correct}}",
+    "feedback_incorrect": "{{feedback_incorrect}}",
+    "button_instructions": "{{button_instructions}}",
+    "button_grading": "{{button_grading}}",
+    "button_resume": "{{button_resume}}",
+    "button_pause": "{{button_pause}}",
+    "search_no_matches": "{{search_no_matches}}",
+    "review_no_incomplete": "{{review_no_incomplete}}",
+    "review_no_marked": "{{review_no_marked}}",
+    "confirm_save_logout": "{{confirm_save_logout}}",
+    "feedback_no_feedback": "{{feedback_no_feedback}}",
+    "pause_message": "{{pause_message}}",
+    "pause_unpause": "{{pause_unpause}}",
+    "delete_title": "{{delete_title}}",
+    "delete_message": "{{delete_message}}",
+    "delete_go_back": "{{delete_go_back}}",
+    "delete_discard": "{{delete_discard}}",
+    "error_prefix": "{{error_prefix}}",
+    "link_test_bank": "{{link_test_bank}}"
+}{{/js_strings}}' class="hidden-data"></div>
+
+<!-- Main Header with Blue Background (Outside of exam container) -->
+<div class="study-main-header">
+    <div class="study-header-content">
+        <div class="study-title">
+            <h1>Study Session</h1>
+        </div>
+        <div class="study-header-right">
+            <a href="#" class="test-bank-link" id="test-bank-link">Test Bank Home Screen</a>
+        </div>
+    </div>
+    
+    <!-- Hidden form for save and logout (kept for compatibility) -->
+    <form method="POST" action="perform_study.php" class="hidden-form" id="hidden-form">
+        <input type="hidden" name="action" value="save_and_logout">
+        <input type="hidden" name="id" value="{{id}}">
+        <input type="hidden" name="examid" value="{{examid}}">
+        <input type="hidden" name="timeremaining" id="timeremaining-input" value="0">
+        <input type="hidden" name="answers" id="answers-input" value="{}">
+        <input type="hidden" name="status" id="status-input" value="{}">
+        <input type="hidden" name="markedforreview" id="markedforreview-input" value="{}">
+        <input type="hidden" name="correct" id="correct-input" value="{}">
+        <input type="hidden" name="studyunit" id="studyunit-input" value="{{subunit_string}}">
+    </form>
+
+    <div class="exam-container" 
+         data-total-questions="{{totalquestions}}" 
+         data-time-remaining="{{timeremaining}}" 
+         data-exam-id="{{examid}}"
+         data-id="{{id}}">
+    <!-- Study Session Controls (moved from header) -->
+    <div class="study-controls-bar">
+        <div class="study-controls-left">
+            <button class="pause-btn" id="pause-btn" 
+                    aria-label="Pause study session" 
+                    title="Pause">
+                <i class="fas fa-pause" id="pause-icon" aria-hidden="true"></i>
+            </button>
+            <div class="timer" id="timer">
+                <span id="time-display">{{timeremaining_formatted}}</span>
+                <div class="timer-label">
+                    <div class="timer-label-line">TIME</div>
+                    <div class="timer-label-line">ELAPSED</div>
+                </div>
+            </div>
+        </div>
+        <div class="study-controls-center">
+            <div class="search-container">
+                <input type="text" id="question-search" 
+                       placeholder="Search questions..." 
+                       class="search-input"
+                       aria-label="Search questions"
+                       role="searchbox">
+                <button class="search-btn" id="search-btn" 
+                        aria-label="Search questions" 
+                        title="Search">
+                    <i class="fas fa-search" aria-hidden="true"></i>
+                </button>
+                <button class="search-nav-btn" id="prev-search-btn" 
+                        aria-label="Previous search result" 
+                        title="Previous match (Shift+F3)">
+                    <i class="fas fa-chevron-up" aria-hidden="true"></i>
+                </button>
+                <button class="search-nav-btn" id="next-search-btn" 
+                        aria-label="Next search result" 
+                        title="Next match (F3)">
+                    <i class="fas fa-chevron-down" aria-hidden="true"></i>
+                </button>
+                <span class="search-counter" id="search-counter"></span>
+            </div>
+        </div>
+        <div class="study-controls-right">
+            <button class="delete-btn" id="delete-btn" 
+                    aria-label="Delete study session" 
+                    title="Delete">
+                <i class="fas fa-trash" aria-hidden="true"></i>
+            </button>
+            <button class="grade-btn" id="grade-btn" 
+                    aria-label="Grade study session" 
+                    title="Grade">
+                <i class="fas fa-check" aria-hidden="true"></i>
+                Grade
+                <i class="fas fa-chevron-down" aria-hidden="true"></i>
+            </button>
+        </div>
+    </div>
+
+
+    <!-- Questions Container with Sidebar -->
+    <div class="questions-layout">
+        <!-- Questions -->
+        <div id="questions-container" class="questions-main">
+            {{#questions}}
+                <div class="question{{#first}} active{{/first}}" 
+                     id="question-{{questionorder}}"
+                     role="main"
+                     aria-labelledby="question-title-{{questionorder}}">
+                    <h3 id="question-title-{{questionorder}}">{{#questionname}}{{questionname}}{{/questionname}}{{^questionname}}Question {{questionorder}}{{/questionname}}</h3>
+                    <div class="question-text" role="group" aria-labelledby="question-title-{{questionorder}}">{{{questiontext}}}</div>
+                    
+                    <div class="answer-options" role="radiogroup" aria-labelledby="question-title-{{questionorder}}">
+                        {{#answers}}
+                            <div class="answer-option">
+                                <input type="radio" name="answer-{{questionorder}}" value="{{id}}" id="answer-{{questionorder}}-{{id}}" {{{checked}}}>
+                                <label for="answer-{{questionorder}}-{{id}}">{{{answer}}}</label>
+                                
+                                <!-- Answer Feedback for this specific answer -->
+                                <div class="answer-feedback answer-feedback-hidden" id="feedback-{{questionorder}}-{{id}}">
+                                    <div class="feedback-content">
+                                        <div class="feedback-icon">
+                                            <i class="feedback-icon-correct fas fa-check-circle feedback-icon-hidden"></i>
+                                            <i class="feedback-icon-incorrect fas fa-times-circle feedback-icon-hidden"></i>
+                                        </div>
+                                        <div class="feedback-text">
+                                            <div class="feedback-result feedback-result-hidden"></div>
+                                            <div class="feedback-message"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {{/answers}}
+                    </div>
+                </div>
+            {{/questions}}
+        </div>
+
+        <!-- Sidebar Toggle Arrow -->
+        <div class="sidebar-toggle-arrow" id="sidebar-toggle-arrow">
+            <button class="toggle-arrow-btn" id="toggle-arrow-btn" 
+                    aria-label="Toggle sidebar visibility" 
+                    title="Toggle sidebar">
+                <i class="fas fa-chevron-right" id="toggle-arrow-icon" aria-hidden="true"></i>
+            </button>
+        </div>
+
+        <!-- Question numbers navigation sidebar -->
+        <div class="question-numbers-sidebar" id="question-numbers">
+            <h4>Questions</h4>
+            {{#questions}}
+                <div class="question-number{{#first}} active{{/first}}" 
+                     data-question="{{questionorder}}"
+                     tabindex="0" 
+                     role="button"
+                     aria-label="Go to question {{questionorder}}{{#questionname_sidebar}}: {{questionname_sidebar}}{{/questionname_sidebar}}">
+                    {{#questionname_sidebar}}<span class="revitimsession-question-name-normal">{{questionname_sidebar}}</span>{{/questionname_sidebar}}{{^questionname_sidebar}}<span class="question-number-text">{{questionorder}}</span>{{/questionname_sidebar}}
+                    <!-- Feedback icons for sidebar -->
+                    <span class="sidebar-feedback-icon sidebar-feedback-hidden" id="sidebar-feedback-{{questionorder}}">
+                        <i class="sidebar-feedback-correct fas fa-check-circle"></i>
+                        <i class="sidebar-feedback-incorrect fas fa-times-circle"></i>
+                        <i class="sidebar-feedback-first-time fas fa-star"></i>
+                    </span>
+                </div>
+            {{/questions}}
+        </div>
+    </div>
+
+
+    <!-- Navigation buttons -->
+    <div class="navigation" id="question-navigation">
+        <div class="navigation-left">
+            <button class="review-flag unmarked" id="review-flag" 
+                    aria-label="Mark question for review" 
+                    title="Mark for review">🏳️</button>
+            {{#review}}
+            <button class="calculator-btn" 
+                    aria-label="View instructions" 
+                    title="Instructions">Instructions</button>
+            {{/review}}
+            {{^review}}
+            <button type="button" id="calculator" 
+                    class="calculator-button" 
+                    name="ciaCalculator" 
+                    aria-label="Open calculator" 
+                    title="Calculator">
+                <i class="fas fa-calculator" aria-hidden="true"></i>
+            </button>
+            {{/review}}
+        </div>
+        <div class="navigation-right">
+            <button class="nav-button" id="prev-btn" disabled>Previous</button>
+            <button class="nav-button" id="next-btn">Next</button>
+            <!-- Help and Filter buttons -->
+            <button class="nav-icon-button" id="help-btn" 
+                    aria-label="Help and instructions" 
+                    title="Help">
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
+            </button>
+            <button class="nav-icon-button" id="filter-btn" 
+                    aria-label="Filter questions by status" 
+                    title="Filter">
+                <i class="fas fa-filter" aria-hidden="true"></i>
+            </button>
+            <!-- Filter Menu (hidden by default) -->
+            <div class="filter-menu filter-menu-hidden" id="filter-menu">
+                <div class="filter-menu-header">
+                    <span class="filter-menu-title">Set Filters</span>
+                    <button class="filter-close-btn" id="filter-close-btn" 
+                            aria-label="Close filter menu" 
+                            title="Close">
+                        <i class="fas fa-times" aria-hidden="true"></i>
+                    </button>
+                </div>
+                <div class="filter-menu-content">
+                    <div class="filter-radios">
+                        <label class="filter-radio-item">
+                            <input type="radio" id="filter-incomplete" name="filter-option" value="incomplete">
+                            <span class="filter-radio-text">Unanswered Questions</span>
+                        </label>
+                        <label class="filter-radio-item">
+                            <input type="radio" id="filter-marked" name="filter-option" value="marked">
+                            <span class="filter-radio-text">Marked Questions</span>
+                        </label>
+                        <label class="filter-radio-item">
+                            <input type="radio" id="filter-incorrect" name="filter-option" value="incorrect">
+                            <span class="filter-radio-text">Incorrect Questions</span>
+                        </label>
+                        <label class="filter-radio-item">
+                            <input type="radio" id="filter-none" name="filter-option" value="none" checked>
+                            <span class="filter-radio-text">No Filters</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <!-- Sidebar Toggle Arrow for Navigation (hidden by default) -->
+            <div class="sidebar-toggle-arrow-nav" id="sidebar-toggle-arrow-nav">
+                <button class="toggle-arrow-btn-nav" id="toggle-arrow-btn-nav" 
+                        aria-label="Show sidebar" 
+                        title="Show sidebar">
+                    <i class="fas fa-chevron-left" id="toggle-arrow-icon-nav" aria-hidden="true"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Instructions Modal -->
+<div id="instructions-modal" class="calculator-modal">
+    <div class="calculator-content">
+        <div class="calculator-header">
+            <h3>Review Instructions</h3>
+            <span class="modal-close-btn">&times;</span>
+        </div>
+        <div class="modal-content">
+            <p>Below is a summary of your answers. You can review your questions in three (3) different ways.</p>
+            <p>The buttons in the lower right-hand corner correspond to these choices:</p>
+            <ul class="modal-list">
+                <li>Review all of your questions and answers.</li>
+                <li>Review questions that are incomplete.</li>
+                <li>Review questions that are marked for review. (Click the 'flag' icon to change the mark for review status.)</li>
+            </ul>
+            <p>You may also click on a question number to link directly to its location in the study session.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Calculator Modal - Created dynamically by calculator.js -->
+
+<!-- Navigator Modal removed - using sidebar navigation instead -->
+
+<!-- Grade Confirmation Modal -->
+<div id="grade-confirmation-modal" class="calculator-modal"
+     data-graded-successfully="{{exam_graded_successfully}}"
+     data-grading-error="{{exam_grading_error}}">
+    <div class="calculator-content grade-modal-content">
+        <div class="calculator-header">
+            <h3 id="grade-modal-title">{{grade_session_title}}</h3>
+            <span id="close-grade-modal-btn" class="modal-close-btn">&times;</span>
+        </div>
+        <div class="grade-modal-message">
+            <p id="grade-modal-message">{{grade_confirm_message}}</p>
+        </div>
+        <div class="grade-modal-buttons">
+            <button type="button" id="go-back-btn" class="nav-button grade-modal-btn">{{go_back_text}}</button>
+            <button type="button" id="confirm-grade-btn" class="nav-button grade-modal-btn grade-confirm-btn">{{grade_text}}</button>
+        </div>
+    </div>
+</div>
+    </div> <!-- Close exam-container -->
+</div> <!-- Close study-main-header -->

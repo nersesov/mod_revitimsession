@@ -1,0 +1,789 @@
+<div class="stats-container" data-score-percentage="{{score_percentage}}">
+    <h1 class="center performance-heading">{{performance_analysis_title}}</h1>
+    
+    <!-- Tab Navigation -->
+    <div class="performance-page-tabs" role="tablist">
+        <button role="tab" aria-controls="grade-report-panel" class="tab-button active-tab" data-tab="grade-report" aria-selected="true">
+            {{grade_report_tab_text}}
+        </button>
+        <button role="tab" aria-controls="study-session-panel" class="tab-button" data-tab="study-session" aria-selected="false">
+            {{study_session_tab_text}}
+        </button>
+        <button role="tab" aria-controls="exam-session-panel" class="tab-button" data-tab="exam-session" aria-selected="false">
+            {{exam_session_tab_text}}
+        </button>
+        <button role="tab" aria-controls="history-panel" class="tab-button" data-tab="history" aria-selected="false">
+            {{history_tab_text}}
+        </button>
+    </div>
+    
+    <!-- Test Bank Home Screen Link -->
+    <div class="action-btn-row">
+        <a class="test-bank-home-link" href="view.php?id={{id}}">
+            {{test_bank_home_screen_text}}
+        </a>
+    </div>
+    
+    <!-- Tab Panels -->
+    <div id="tab-panels">
+        <!-- Grade Report Tab -->
+        <div id="grade-report-panel" class="tab-panel active" role="tabpanel" aria-labelledby="grade-report">
+            <div id="grade-report" class="center">
+        {{#alternative_examid}}
+        <button class="view-grade-report-btn" data-redirect-url="stats.php?id={{id}}&examid={{alternative_examid}}">{{view_grade_report_text}}</button>
+        {{/alternative_examid}}
+        <h2>{{grade_report_title}}</h2>
+        
+        <div id="session-time">
+            <div>{{date_time_range}}</div>
+            <div>Session Type: {{session_type_text}}</div>
+        </div>
+        
+        <div id="report-content">
+            <div id="session-summary">
+                <div id="left-summary">
+                    <span class="pie-graph large-graph">
+                        <span class="value">{{score_percentage}}%</span>
+                    </span>
+                    <div class="time-summary-group">
+                        <div class="time-summary">
+                            <div class="icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="details">
+                                {{quiz_duration_text}}
+                                <br/><span class="time">{{total_time_formatted}}</span><br/>
+                                {{mins_text}}
+                            </div>
+                        </div>
+                        <div class="time-summary">
+                            <div class="icon">
+                                <i class="fas fa-stopwatch"></i>
+                            </div>
+                            <div class="details">
+                                {{per_question_text}}
+                                <br/><span class="time">{{time_per_question_formatted}}</span><br/>
+                                {{mins_text}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="right-summary" class="table-responsive">
+                    <table class="table" role="none">
+                        <tr>
+                            <td class="detail-title">{{score_total_questions_text}}:</td>
+                            <td>{{score_percentage}}%</td>
+                        </tr>
+                        <tr>
+                            <td class="detail-title">{{score_answered_questions_text}}:</td>
+                            <td>{{answered_score_percentage}}%</td>
+                        </tr>
+                        <tr>
+                            <td class="detail-title">{{questions_seen_text}}:</td>
+                            <td>{{total_questions}}</td>
+                        </tr>
+                        <tr>
+                            <td class="detail-title">{{questions_answered_text}}:</td>
+                            <td>{{answered_questions}}</td>
+                        </tr>
+                        <tr>
+                            <td class="detail-title">{{questions_incorrect_text}}:</td>
+                            <td>{{incorrect_answers}}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            
+            <div id="summary-caption">
+                {{study_score_caption}}
+            </div>
+            
+            
+            <div id="recycle-options">
+                <div class="main-options">
+                    <div class="options">
+                        <div>
+                            <p>{{create_new_session_text}}:</p>
+                        </div>
+                        <div class="row">
+                            <ul class="creation-options">
+                                {{#has_incorrect_or_marked}}
+                                <li>
+                                    <a href="stats.php?id={{id}}&examid={{examid}}&create_marked=1">
+                                        {{missed_or_marked_text}}
+                                        <i class="fas fa-arrow-circle-right">​</i>
+                                    </a>
+                                    <ul>
+                                        <li>{{incorrect_plus_marked_count}} {{questions_text}}</li>
+                                    </ul>
+                                </li>
+                                {{/has_incorrect_or_marked}}
+                                {{#has_incorrect}}
+                                <li>
+                                    <a href="stats.php?id={{id}}&examid={{examid}}&create_incorrect=1">
+                                        {{questions_incorrect_text}}
+                                        <i class="fas fa-arrow-circle-right">​</i>
+                                    </a>
+                                    <ul>
+                                        <li>{{incorrect_answers}} {{questions_text}}</li>
+                                    </ul>
+                                </li>
+                                {{/has_incorrect}}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="addn-options">
+                    <div class="options">
+                        <div>
+                            <div class="options-title-with-expand">
+                                <span class="expand-icon" id="grade-icon-other-quizzes" data-action="toggle-grade-other-quizzes">+</span>
+                                <span class="options-title">{{or_create_other_quizzes_text}}</span>
+                            </div>
+                        </div>
+                        <div class="row stats-grade-other-quizzes-content" id="grade-other-quizzes-content">
+                            <ul class="creation-options">
+                                <li>
+                                    <a href="stats.php?id={{id}}&examid={{examid}}&create_all=1">
+                                        {{total_questions_session_text}}
+                                        <i class="fas fa-arrow-circle-right">​</i>
+                                    </a>
+                                    <ul>
+                                        <li>{{total_questions}} {{questions_text}}</li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <a href="stats.php?id={{id}}&examid={{examid}}&create_correct=1">
+                                        {{questions_correct_text}}
+                                        <i class="fas fa-arrow-circle-right">​</i>
+                                    </a>
+                                    <ul>
+                                        <li>{{correct_answers}} {{questions_text}}</li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <a href="stats.php?id={{id}}&examid={{examid}}&create_unanswered=1">
+                                        {{questions_not_answered_text}}
+                                        <i class="fas fa-arrow-circle-right">​</i>
+                                    </a>
+                                    <ul>
+                                        <li>{{unanswered_questions}} {{questions_text}}</li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <a href="stats.php?id={{id}}&examid={{examid}}&create_marked_only=1">
+                                        {{questions_marked_text}}
+                                        <i class="fas fa-arrow-circle-right">​</i>
+                                    </a>
+                                    <ul>
+                                        <li>{{marked_questions}} {{questions_text}}</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <h2>{{detailed_breakdown_title}}</h2>
+        <div id="analysis-details">
+            <div class="detailed-breakdown-table">
+                <div class="table-header">
+                    <div class="header-cell category-header">{{detailed_breakdown_category}}</div>
+                    <div class="header-cell">{{detailed_breakdown_questions_available}}</div>
+                    <div class="header-cell">{{detailed_breakdown_most_recent}}</div>
+                    <div class="header-cell">{{detailed_breakdown_last_3_attempts}}</div>
+                    <div class="header-cell">{{detailed_breakdown_cumulative_score}}</div>
+                </div>
+                
+                {{#organized_categories}}
+                {{#is_root}}
+                    <!-- Root category (no parent) -->
+                    <div class="category-row">
+                        <div class="category-cell">
+                            <span class="category-name"><strong>{{categoryname}}</strong></span>
+                        </div>
+                        <div class="data-cell">{{item_count}}</div>
+                        <div class="data-cell">
+                            {{#most_recent_answered}}
+                                {{most_recent_correct}} | {{most_recent_answered}}
+                                <div class="history-percentage-cell">
+                                    <div class="history-donut-chart {{most_recent_percentage_class}}" data-percentage="{{most_recent_percentage}}"></div>
+                                    <span class="history-percentage-text">{{most_recent_percentage}}%</span>
+                                </div>
+                            {{/most_recent_answered}}
+                            {{^most_recent_answered}}
+                                -
+                            {{/most_recent_answered}}
+                        </div>
+                        <div class="data-cell">
+                            {{#last_3_answered}}
+                                {{last_3_correct}} | {{last_3_answered}}
+                                <div class="history-percentage-cell">
+                                    <div class="history-donut-chart {{last_3_percentage_class}}" data-percentage="{{last_3_percentage}}"></div>
+                                    <span class="history-percentage-text">{{last_3_percentage}}%</span>
+                                </div>
+                            {{/last_3_answered}}
+                            {{^last_3_answered}}
+                                -
+                            {{/last_3_answered}}
+                        </div>
+                        <div class="data-cell">
+                            {{#answered_count}}
+                                {{correct_count}} | {{answered_count}}
+                                <div class="history-percentage-cell">
+                                    <div class="history-donut-chart {{percentage_class}}" data-percentage="{{percentage}}"></div>
+                                    <span class="history-percentage-text">{{percentage}}%</span>
+                                </div>
+                            {{/answered_count}}
+                            {{^answered_count}}
+                                -
+                            {{/answered_count}}
+                        </div>
+                    </div>
+                {{/is_root}}
+                {{^is_root}}
+                    <!-- Parent category with subcategories -->
+                    <div class="category-row">
+                        <div class="category-cell">
+                            <span class="expand-icon" id="icon-{{parent_id}}" data-action="toggle-subcategories" data-parent-id="{{parent_id}}">+</span>
+                            <span class="category-name"><strong>{{parentname}}</strong></span>
+                        </div>
+                        <div class="data-cell">{{parent_total}}</div>
+                        <div class="data-cell">
+                            {{#parent_most_recent_answered_total}}
+                                {{parent_most_recent_correct_total}} | {{parent_most_recent_answered_total}}
+                                <div class="history-percentage-cell">
+                                    <div class="history-donut-chart {{parent_most_recent_percentage_class}}" data-percentage="{{parent_most_recent_percentage}}"></div>
+                                    <span class="history-percentage-text">{{parent_most_recent_percentage}}%</span>
+                                </div>
+                            {{/parent_most_recent_answered_total}}
+                            {{^parent_most_recent_answered_total}}
+                                -
+                            {{/parent_most_recent_answered_total}}
+                        </div>
+                        <div class="data-cell">
+                            {{#parent_last_3_answered_total}}
+                                {{parent_last_3_correct_total}} | {{parent_last_3_answered_total}}
+                                <div class="history-percentage-cell">
+                                    <div class="history-donut-chart {{parent_last_3_percentage_class}}" data-percentage="{{parent_last_3_percentage}}"></div>
+                                    <span class="history-percentage-text">{{parent_last_3_percentage}}%</span>
+                                </div>
+                            {{/parent_last_3_answered_total}}
+                            {{^parent_last_3_answered_total}}
+                                -
+                            {{/parent_last_3_answered_total}}
+                        </div>
+                        <div class="data-cell">
+                            {{#parent_answered_total}}
+                                {{parent_correct_total}} | {{parent_answered_total}}
+                                <div class="history-percentage-cell">
+                                    <div class="history-donut-chart {{parent_percentage_class}}" data-percentage="{{parent_percentage}}"></div>
+                                    <span class="history-percentage-text">{{parent_percentage}}%</span>
+                                </div>
+                            {{/parent_answered_total}}
+                            {{^parent_answered_total}}
+                                -
+                            {{/parent_answered_total}}
+                        </div>
+                    </div>
+                    <div class="subcategory-row stats-subcategory-row" id="sub-{{parent_id}}">
+                        {{#categories}}
+                        <div class="subcategory-item">
+                            <div class="subcategory-cell">
+                                <span class="subcategory-name">{{categoryname}}</span>
+                            </div>
+                            <div class="data-cell">{{item_count}}</div>
+                            <div class="data-cell">
+                                {{#most_recent_answered}}
+                                    {{most_recent_correct}} | {{most_recent_answered}}
+                                    <div class="history-percentage-cell">
+                                        <div class="history-donut-chart {{most_recent_percentage_class}}" data-percentage="{{most_recent_percentage}}"></div>
+                                        <span class="history-percentage-text">{{most_recent_percentage}}%</span>
+                                    </div>
+                                {{/most_recent_answered}}
+                                {{^most_recent_answered}}
+                                    -
+                                {{/most_recent_answered}}
+                            </div>
+                            <div class="data-cell">
+                                {{#last_3_answered}}
+                                    {{last_3_correct}} | {{last_3_answered}}
+                                    <div class="history-percentage-cell">
+                                        <div class="history-donut-chart {{last_3_percentage_class}}" data-percentage="{{last_3_percentage}}"></div>
+                                        <span class="history-percentage-text">{{last_3_percentage}}%</span>
+                                    </div>
+                                {{/last_3_answered}}
+                                {{^last_3_answered}}
+                                    -
+                                {{/last_3_answered}}
+                            </div>
+                            <div class="data-cell">
+                            {{#answered_count}}
+                                {{correct_count}} | {{answered_count}}
+                                <div class="history-percentage-cell">
+                                    <div class="history-donut-chart {{percentage_class}}" data-percentage="{{percentage}}"></div>
+                                    <span class="history-percentage-text">{{percentage}}%</span>
+                                </div>
+                            {{/answered_count}}
+                            {{^answered_count}}
+                                -
+                            {{/answered_count}}
+                            </div>
+                    </div>
+                        {{/categories}}
+                    </div>
+                {{/is_root}}
+                {{/organized_categories}}
+            </div>
+        </div>
+        </div>
+    </div>
+    
+    <!-- Study Session Tab -->
+    <div id="study-session-panel" class="tab-panel" role="tabpanel" aria-labelledby="study-session">
+        <div class="study-session-container">
+            <div class="study-session-header">
+                <a href="view.php?id={{id}}" class="btn btn-primary create-quiz-btn">{{create_custom_quiz}}</a>
+                <a href="#" class="table-help-link" data-action="open-table-help-modal">
+                    <i class="fas fa-question-circle"></i> {{table_help}}
+                </a>
+            </div>
+            
+            <div class="study-session-table">
+                <div class="table-header">
+                    <div class="header-cell category-header">{{detailed_breakdown_category}}</div>
+                    <div class="header-cell">{{detailed_breakdown_questions_available}}</div>
+                    <div class="header-cell">{{detailed_breakdown_most_recent}}</div>
+                    <div class="header-cell">{{detailed_breakdown_last_3_attempts}}</div>
+                    <div class="header-cell">{{detailed_breakdown_cumulative_score}}</div>
+                </div>
+                
+                {{#organized_categories}}
+                {{#is_root}}
+                    <!-- Root category (no parent) -->
+                    <div class="category-row">
+                        <div class="category-cell">
+                            <span class="category-name"><strong>{{categoryname}}</strong></span>
+                        </div>
+                        <div class="data-cell">{{item_count}}</div>
+                        <div class="data-cell">
+                            {{#most_recent_answered}}
+                                {{most_recent_correct}} | {{most_recent_answered}}
+                                <div class="history-percentage-cell">
+                                    <div class="history-donut-chart {{most_recent_percentage_class}}" data-percentage="{{most_recent_percentage}}"></div>
+                                    <span class="history-percentage-text">{{most_recent_percentage}}%</span>
+                                </div>
+                            {{/most_recent_answered}}
+                            {{^most_recent_answered}}
+                                -
+                            {{/most_recent_answered}}
+                        </div>
+                        <div class="data-cell">
+                            {{#last_3_answered}}
+                                {{last_3_correct}} | {{last_3_answered}}
+                                <div class="history-percentage-cell">
+                                    <div class="history-donut-chart {{last_3_percentage_class}}" data-percentage="{{last_3_percentage}}"></div>
+                                    <span class="history-percentage-text">{{last_3_percentage}}%</span>
+                                </div>
+                            {{/last_3_answered}}
+                            {{^last_3_answered}}
+                                -
+                            {{/last_3_answered}}
+                        </div>
+                        <div class="data-cell">
+                            {{#answered_count}}
+                                {{correct_count}} | {{answered_count}}
+                                <div class="history-percentage-cell">
+                                    <div class="history-donut-chart {{percentage_class}}" data-percentage="{{percentage}}"></div>
+                                    <span class="history-percentage-text">{{percentage}}%</span>
+                                </div>
+                            {{/answered_count}}
+                            {{^answered_count}}
+                                -
+                            {{/answered_count}}
+                        </div>
+                    </div>
+                {{/is_root}}
+                {{^is_root}}
+                    <!-- Parent category with subcategories -->
+                    <div class="category-row">
+                        <div class="category-cell">
+                            <span class="expand-icon" id="study-icon-{{parent_id}}" data-action="toggle-study-subcategories" data-parent-id="{{parent_id}}">+</span>
+                            <span class="category-name"><strong>{{parentname}}</strong></span>
+                        </div>
+                        <div class="data-cell">{{parent_total}}</div>
+                        <div class="data-cell">
+                            {{#parent_most_recent_answered_total}}
+                                {{parent_most_recent_correct_total}} | {{parent_most_recent_answered_total}}
+                                <div class="history-percentage-cell">
+                                    <div class="history-donut-chart {{parent_most_recent_percentage_class}}" data-percentage="{{parent_most_recent_percentage}}"></div>
+                                    <span class="history-percentage-text">{{parent_most_recent_percentage}}%</span>
+                                </div>
+                            {{/parent_most_recent_answered_total}}
+                            {{^parent_most_recent_answered_total}}
+                                -
+                            {{/parent_most_recent_answered_total}}
+                        </div>
+                        <div class="data-cell">
+                            {{#parent_last_3_answered_total}}
+                                {{parent_last_3_correct_total}} | {{parent_last_3_answered_total}}
+                                <div class="history-percentage-cell">
+                                    <div class="history-donut-chart {{parent_last_3_percentage_class}}" data-percentage="{{parent_last_3_percentage}}"></div>
+                                    <span class="history-percentage-text">{{parent_last_3_percentage}}%</span>
+                                </div>
+                            {{/parent_last_3_answered_total}}
+                            {{^parent_last_3_answered_total}}
+                                -
+                            {{/parent_last_3_answered_total}}
+                        </div>
+                        <div class="data-cell">
+                            {{#parent_answered_total}}
+                                {{parent_correct_total}} | {{parent_answered_total}}
+                                <div class="history-percentage-cell">
+                                    <div class="history-donut-chart {{parent_percentage_class}}" data-percentage="{{parent_percentage}}"></div>
+                                    <span class="history-percentage-text">{{parent_percentage}}%</span>
+                                </div>
+                            {{/parent_answered_total}}
+                            {{^parent_answered_total}}
+                                -
+                            {{/parent_answered_total}}
+                        </div>
+                    </div>
+                    <div class="subcategory-container stats-subcategory-container" id="study-sub-{{parent_id}}">
+                        {{#categories}}
+                        <div class="subcategory-row">
+                            <div class="subcategory-cell">
+                                <span class="subcategory-name">{{categoryname}}</span>
+                            </div>
+                            <div class="data-cell">{{item_count}}</div>
+                            <div class="data-cell">
+                                {{#most_recent_answered}}
+                                    {{most_recent_correct}} | {{most_recent_answered}}
+                                    <div class="history-percentage-cell">
+                                        <div class="history-donut-chart {{most_recent_percentage_class}}" data-percentage="{{most_recent_percentage}}"></div>
+                                        <span class="history-percentage-text">{{most_recent_percentage}}%</span>
+                                    </div>
+                                {{/most_recent_answered}}
+                                {{^most_recent_answered}}
+                                    -
+                                {{/most_recent_answered}}
+                            </div>
+                            <div class="data-cell">
+                                {{#last_3_answered}}
+                                    {{last_3_correct}} | {{last_3_answered}}
+                                    <div class="history-percentage-cell">
+                                        <div class="history-donut-chart {{last_3_percentage_class}}" data-percentage="{{last_3_percentage}}"></div>
+                                        <span class="history-percentage-text">{{last_3_percentage}}%</span>
+                                    </div>
+                                {{/last_3_answered}}
+                                {{^last_3_answered}}
+                                    -
+                                {{/last_3_answered}}
+                            </div>
+                            <div class="data-cell">
+                            {{#answered_count}}
+                                {{correct_count}} | {{answered_count}}
+                                <div class="history-percentage-cell">
+                                    <div class="history-donut-chart {{percentage_class}}" data-percentage="{{percentage}}"></div>
+                                    <span class="history-percentage-text">{{percentage}}%</span>
+                                </div>
+                            {{/answered_count}}
+                            {{^answered_count}}
+                                -
+                            {{/answered_count}}
+                            </div>
+                        </div>
+                        {{/categories}}
+                    </div>
+                {{/is_root}}
+                {{/organized_categories}}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Table Help Modal -->
+    <div id="table-help-modal" class="modal-overlay stats-modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="modal-close-btn" data-action="close-table-help-modal">
+                    <span class="close-icon">×</span>
+                </button>
+                <h2 class="modal-title">{{table_help}}</h2>
+            </div>
+            <div class="modal-body">
+                <div class="help-content">
+                    <div class="help-item">
+                        <div class="help-label">
+                            <div class="help-arrow-down"></div>
+                            {{questions_answered_right}}
+                        </div>
+                        <div class="help-value">7</div>
+                    </div>
+                    
+                    <div class="help-item">
+                        <div class="help-label">
+                            <div class="help-arrow-up"></div>
+                            {{questions_seen}}
+                        </div>
+                        <div class="help-value">22</div>
+                    </div>
+                    
+                    <div class="help-item">
+                        <div class="help-label">
+                            <div class="help-arrow-down"></div>
+                            {{quiz_session_score}}
+                            </div>
+                        <div class="help-score">
+                            <div class="help-progress-circle">
+                                <div class="progress-segment"></div>
+                            </div>
+                            <span class="help-percentage">95%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="#" class="close-window-link" data-action="close-table-help-modal">{{close_window}}</a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Exam Session Tab -->
+    <div id="exam-session-panel" class="tab-panel" role="tabpanel" aria-labelledby="exam-session">
+        <div class="study-session-container">
+            <div class="study-session-header">
+                <a href="view.php?id={{id}}" class="btn btn-primary create-quiz-btn">{{create_custom_quiz}}</a>
+                <a href="#" class="table-help-link" data-action="open-table-help-modal">
+                    <i class="fas fa-question-circle"></i> {{table_help}}
+                </a>
+            </div>
+            
+            <div class="study-session-table">
+                <div class="table-header">
+                    <div class="header-cell category-header">{{detailed_breakdown_category}}</div>
+                    <div class="header-cell">{{detailed_breakdown_questions_available}}</div>
+                    <div class="header-cell">{{detailed_breakdown_most_recent}}</div>
+                    <div class="header-cell">{{detailed_breakdown_last_3_attempts}}</div>
+                    <div class="header-cell">{{detailed_breakdown_cumulative_score}}</div>
+                            </div>
+                
+                {{#exam_categories}}
+                {{#is_root}}
+                    <!-- Root category (no parent) -->
+                    <div class="category-row">
+                        <div class="category-cell">
+                            <span class="category-name"><strong>{{categoryname}}</strong></span>
+                        </div>
+                        <div class="data-cell">{{item_count}}</div>
+                        <div class="data-cell">
+                            {{#most_recent_answered}}
+                                {{most_recent_correct}} | {{most_recent_answered}}
+                                <div class="history-percentage-cell">
+                                    <div class="history-donut-chart {{most_recent_percentage_class}}" data-percentage="{{most_recent_percentage}}"></div>
+                                    <span class="history-percentage-text">{{most_recent_percentage}}%</span>
+                                </div>
+                            {{/most_recent_answered}}
+                            {{^most_recent_answered}}
+                                -
+                            {{/most_recent_answered}}
+                    </div>
+                        <div class="data-cell">
+                            {{#last_3_answered}}
+                                {{last_3_correct}} | {{last_3_answered}}
+                                <div class="history-percentage-cell">
+                                    <div class="history-donut-chart {{last_3_percentage_class}}" data-percentage="{{last_3_percentage}}"></div>
+                                    <span class="history-percentage-text">{{last_3_percentage}}%</span>
+                            </div>
+                            {{/last_3_answered}}
+                            {{^last_3_answered}}
+                                -
+                            {{/last_3_answered}}
+                        </div>
+                        <div class="data-cell">
+                            {{#answered_count}}
+                                {{correct_count}} | {{answered_count}}
+                                <div class="history-percentage-cell">
+                                    <div class="history-donut-chart {{percentage_class}}" data-percentage="{{percentage}}"></div>
+                                    <span class="history-percentage-text">{{percentage}}%</span>
+                    </div>
+                            {{/answered_count}}
+                            {{^answered_count}}
+                                -
+                            {{/answered_count}}
+                        </div>
+                    </div>
+                {{/is_root}}
+                {{^is_root}}
+                    <!-- Parent category with subcategories -->
+                    <div class="category-row">
+                        <div class="category-cell">
+                            <span class="expand-icon" id="exam-icon-{{parent_id}}" data-action="toggle-exam-subcategories" data-parent-id="{{parent_id}}">+</span>
+                            <span class="category-name"><strong>{{parentname}}</strong></span>
+                        </div>
+                        <div class="data-cell">{{parent_total}}</div>
+                        <div class="data-cell">
+                            {{#parent_most_recent_answered_total}}
+                                {{parent_most_recent_correct_total}} | {{parent_most_recent_answered_total}}
+                                <div class="history-percentage-cell">
+                                    <div class="history-donut-chart {{parent_most_recent_percentage_class}}" data-percentage="{{parent_most_recent_percentage}}"></div>
+                                    <span class="history-percentage-text">{{parent_most_recent_percentage}}%</span>
+                </div>
+                            {{/parent_most_recent_answered_total}}
+                            {{^parent_most_recent_answered_total}}
+                                -
+                            {{/parent_most_recent_answered_total}}
+                        </div>
+                        <div class="data-cell">
+                            {{#parent_last_3_answered_total}}
+                                {{parent_last_3_correct_total}} | {{parent_last_3_answered_total}}
+                                <div class="history-percentage-cell">
+                                    <div class="history-donut-chart {{parent_last_3_percentage_class}}" data-percentage="{{parent_last_3_percentage}}"></div>
+                                    <span class="history-percentage-text">{{parent_last_3_percentage}}%</span>
+                                </div>
+                            {{/parent_last_3_answered_total}}
+                            {{^parent_last_3_answered_total}}
+                                -
+                            {{/parent_last_3_answered_total}}
+                                    </div>
+                        <div class="data-cell">
+                            {{#parent_answered_total}}
+                                {{parent_correct_total}} | {{parent_answered_total}}
+                                <div class="history-percentage-cell">
+                                    <div class="history-donut-chart {{parent_percentage_class}}" data-percentage="{{parent_percentage}}"></div>
+                                    <span class="history-percentage-text">{{parent_percentage}}%</span>
+                                </div>
+                            {{/parent_answered_total}}
+                            {{^parent_answered_total}}
+                                -
+                            {{/parent_answered_total}}
+                        </div>
+                    </div>
+                    <div class="subcategory-container stats-subcategory-container" id="exam-sub-{{parent_id}}">
+                        {{#categories}}
+                        <div class="subcategory-row">
+                            <div class="subcategory-cell">
+                                <span class="subcategory-name">{{categoryname}}</span>
+                            </div>
+                            <div class="data-cell">{{item_count}}</div>
+                            <div class="data-cell">
+                                {{#most_recent_answered}}
+                                    {{most_recent_correct}} | {{most_recent_answered}}
+                                    <div class="history-percentage-cell">
+                                        <div class="history-donut-chart {{most_recent_percentage_class}}" data-percentage="{{most_recent_percentage}}"></div>
+                                        <span class="history-percentage-text">{{most_recent_percentage}}%</span>
+                                    </div>
+                                {{/most_recent_answered}}
+                                {{^most_recent_answered}}
+                                    -
+                                {{/most_recent_answered}}
+                                </div>
+                            <div class="data-cell">
+                                {{#last_3_answered}}
+                                    {{last_3_correct}} | {{last_3_answered}}
+                                    <div class="history-percentage-cell">
+                                        <div class="history-donut-chart {{last_3_percentage_class}}" data-percentage="{{last_3_percentage}}"></div>
+                                        <span class="history-percentage-text">{{last_3_percentage}}%</span>
+                                    </div>
+                                {{/last_3_answered}}
+                                {{^last_3_answered}}
+                                    -
+                                {{/last_3_answered}}
+                            </div>
+                            <div class="data-cell">
+                            {{#answered_count}}
+                                {{correct_count}} | {{answered_count}}
+                                <div class="history-percentage-cell">
+                                    <div class="history-donut-chart {{percentage_class}}" data-percentage="{{percentage}}"></div>
+                                    <span class="history-percentage-text">{{percentage}}%</span>
+                                </div>
+                            {{/answered_count}}
+                            {{^answered_count}}
+                                -
+                            {{/answered_count}}
+                            </div>
+                        </div>
+                        {{/categories}}
+                    </div>
+                {{/is_root}}
+                {{/exam_categories}}
+            </div>
+        </div>
+    </div>
+    
+    <!-- History Tab -->
+    <div id="history-panel" class="tab-panel" role="tabpanel" aria-labelledby="history">
+        <h2>{{session_history}}</h2>
+        
+        <!-- History Filters -->
+        <div class="history-filters">
+            <span class="filter-label">{{filters}}</span>
+            <label class="filter-checkbox">
+                <input type="checkbox" id="show-last-3">
+                {{show_only_last_3}}
+            </label>
+            <label class="filter-checkbox">
+                <input type="checkbox" id="study-sessions-only">
+                {{view_only_study_sessions}}
+            </label>
+            <label class="filter-checkbox">
+                <input type="checkbox" id="practice-exams-only">
+                {{view_only_practice_exams}}
+            </label>
+        </div>
+        
+        <!-- History Table -->
+        <div class="history-table-wrapper">
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>{{session_type}}</th>
+                        <th>{{related_study_units}}</th>
+                        <th>{{completion_date}}</th>
+                        <th>{{total_qs}}</th>
+                        <th>{{avg_time_per_question_header}}</th>
+                        <th>{{time_of_session}}</th>
+                        <th>{{questions_answered_header}}</th>
+                        <th>{{questions_correct_header}}</th>
+                        <th>{{percent_correct}}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#history_data}}
+                    <tr class="history-row" data-session-type="{{exam_type}}" data-is-study="{{is_study_session}}">
+                        <td>
+                            <div class="session-type-cell">
+                                <span class="session-type-text">{{exam_type}}</span>
+                                <a href="{{perform_url}}?id={{id}}&examid={{exam_id}}" class="review-btn-hover">{{review}}</a>
+                            </div>
+                        </td>
+                        <td>{{studyunit}}</td>
+                        <td>{{completion_date}}</td>
+                        <td>{{total_questions}}</td>
+                        <td>{{avg_time_per_question}}</td>
+                        <td>{{session_time}}</td>
+                        <td>{{answered_questions}}</td>
+                        <td>{{correct_questions}}</td>
+                        <td>
+                            <div class="history-percentage-cell">
+                                <div class="history-donut-chart {{percentage_class}}"></div>
+                                <span class="history-percentage-text">{{percent_correct}}%</span>
+                            </div>
+                        </td>
+                    </tr>
+                    {{/history_data}}
+                        {{^history_data}}
+                        <tr>
+                            <td colspan="9" class="no-data">{{no_completed_sessions_found}}</td>
+                        </tr>
+                        {{/history_data}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Load JavaScript -->
+<script src="javascript/stats.js"></script>
+
